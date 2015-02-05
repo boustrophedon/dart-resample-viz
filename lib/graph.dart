@@ -94,6 +94,14 @@ class ResampleGraph {
       }
     }
   }
+  
+  void new_edge(Vertex v1, Vertex v2, int priority) {
+    Edge e = new Edge(v1, v2, priority);
+    if (e.isbad) {
+      heap.add(e);
+      e.inheap = true;
+    }
+  }
 
   void generate_edges() {}
 
@@ -174,27 +182,15 @@ class ResampleGridGraph extends ResampleGraph {
     for (int y = 0; y < size; y++) {
       for (int x = 0; x < size; x++) {
         if (x+1 < size || is_torus) {
-          Edge e = new Edge(vertices[y*size + x], vertices[y*size + (x+1)%size], priority);
-          if (e.isbad) {
-            heap.add(e);
-            e.inheap = true;
-          }
+          new_edge(vertices[y*size + x], vertices[y*size + (x+1)%size], priority);
           priority+=1;
         }
         if ( (((x+1 < size) && (y+1 < size)) || is_torus) && (rng.nextDouble() <= q)) {
-          Edge e = new Edge(vertices[y*size + x], vertices[((y+1)%size)*size + (x+1)%size], priority);
-          if (e.isbad) {
-            heap.add(e);
-            e.inheap = true;
-          }
+          new_edge(vertices[y*size + x], vertices[((y+1)%size)*size + (x+1)%size], priority);
           priority+=1;
         }
         if (y+1 < size || is_torus) {
-          Edge e = new Edge(vertices[y*size + x], vertices[((y+1)%size)*size + x], priority);
-          if (e.isbad) {
-            heap.add(e);
-            e.inheap = true;
-          }
+          new_edge(vertices[y*size + x], vertices[((y+1)%size)*size + x], priority);
           priority+=1;
         }
       }
@@ -209,14 +205,6 @@ class ResampleRandomGraph extends ResampleGraph {
   ResampleRandomGraph(
       {size: 25, num_colors: 6, p: null, p_distribution: 3, this.degree: 4}) : super(size, num_colors, p, p_distribution) {
     graph_type = "Random";
-  }
-
-  void new_edge(Vertex v1, Vertex v2, int priority) {
-    Edge e = new Edge(v1, v2, priority);
-    if (e.isbad) {
-      heap.add(e);
-      e.inheap = true;
-    }
   }
 
   void generate_edges() {
