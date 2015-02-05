@@ -207,17 +207,37 @@ class ResampleRandomGraph extends ResampleGraph {
     graph_type = "Random";
   }
 
+  void generate_vertices() {
+    vertices = new List<Vertex>(size);
+    for (int i = 0; i < size; i++) {
+      num y = sin((2*PI*i)/(size));
+      num x = cos((2*PI*i)/(size));
+      vertices[i] = new Vertex(x, y, choose_color());
+    }
+  }
+
   void generate_edges() {
     int priority = 0;
+    for (int i = 0; i < size; i++) {
+      new_edge(vertices[i], vertices[(i+1)%size], priority);
+      priority++;
+    }
     for (Vertex v in vertices) {
-      while (v.edges.length != degree) {
-        Vertex vo = vertices[rng.nextInt(vertices.length)];
-        while (vo==v || vo.edges.length == degree) {
-          vo = vertices[rng.nextInt(vertices.length)];
+      int count = 0;
+      while (v.edges.length < degree && count < 300) {
+        Vertex vo = vertices[rng.nextInt(size)];
+        //print(vo.edges.length);
+        if (vo.edges.length < degree && vo != v && !v.edges.contains(vo)) {
+          new_edge(v, vo, priority);
+          priority++;
         }
-        new_edge(v, vo, priority);
-        priority++;
+        else {
+          count++;
+        }
+      }
+      if (count > 300) {
+        print('count too high');
       }
     }
   }
-} 
+}

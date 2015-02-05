@@ -1,8 +1,8 @@
 part of graph;
 
 class Vertex {
-  int x;
-  int y;
+  num x;
+  num y;
   int resamples = 0;
   List<Edge> edges;
   String color;
