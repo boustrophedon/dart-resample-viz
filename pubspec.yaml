@@ -1,0 +1,10 @@
+name: dart_resample_viz
+version: "0.1.0"
+description: a lovasz local lemma resample-based visualization of a graph coloring problem
+author: Harry Stern <harry.stern@rutgers.edu>
+homepage: https://github.com/boustrophedon/dart-resample-grid-viz
+environment:
+  sdk: ">=1.6.0"
+dependencies:
+  browser: any
+  collection: any

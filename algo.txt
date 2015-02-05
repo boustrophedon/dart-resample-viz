@@ -1,0 +1,27 @@
+vertex:
+	x position
+	y position
+	edge list
+	color
+edge:
+	vertex 1, vertex 2
+	priority
+	isbad
+
+
+generate n by n grid
+	1000 by 1000 2d array
+	generate a vertex for each position in the array
+	create edge objects for each edge by going through the array and creating edges Edge(v, vertices[y][x+1 mod 1000], i) Edge(v, vertices[y+1 mod 1000][x], i++) where the last thing is priority
+	add to vertex's edge list
+for each vertex, color it randomly with one of 6 color, with set probabilities
+
+check for bad edges and insert into heap
+	traverse edge list, check if bad, add to heap
+
+resample:
+	get top edge from heap
+	resample both vertices
+	check all edges from both vertices for badness, add to heap
+
+resample until heap is empty
