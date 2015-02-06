@@ -31,8 +31,12 @@ class ResampleRenderer {
     step_delay = new Duration(milliseconds: controls.querySelector("#timer-value").valueAsNumber*10);
   }
 
-  void start() {
+  void output_start_text() {
     output.value += "Starting new resample run.\nProbability distribution: ${graph.probabilities}";
+  }
+
+  void start() {
+    output_start_text();
     run();
   }
 
@@ -209,6 +213,12 @@ class ResampleRandomRenderer extends ResampleRenderer {
       output.value+=e.toString();
       throw e;
     }
+  }
+
+  void output_start_text() {
+    output.value += "Starting new resample run.\nProbability distribution: ${graph.probabilities}";
+    num avg_degree = graph.vertices.fold(0, (sum, v) => (sum+v.edges.length))/graph.vertices.length;
+    output.value+="\nAverage degree: ${avg_degree}\n";
   }
 
   void draw_vertex(Vertex v) {

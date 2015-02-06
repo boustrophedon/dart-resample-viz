@@ -224,10 +224,9 @@ class ResampleRandomGraph extends ResampleGraph {
     }
     for (Vertex v in vertices) {
       int count = 0;
-      while (v.edges.length < degree && count < 300) {
+      while (v.edges.length < degree && count < size*size*100) {
         Vertex vo = vertices[rng.nextInt(size)];
-        //print(vo.edges.length);
-        if (vo.edges.length < degree && vo != v && !v.edges.contains(vo)) {
+        if (vo.edges.length < degree && vo != v && !v.edges.any( (edge)=>(edge.v1 == vo || edge.v2 == vo) )) {
           new_edge(v, vo, priority);
           priority++;
         }
@@ -235,7 +234,7 @@ class ResampleRandomGraph extends ResampleGraph {
           count++;
         }
       }
-      if (count > 300) {
+      if (count >= size*size*100) {
         print('count too high');
       }
     }
