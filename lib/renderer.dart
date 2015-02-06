@@ -190,10 +190,10 @@ class ResampleRandomRenderer extends ResampleRenderer {
     int num_colors = 6;
     int degree = 4;
 
-    scale = size/2 * VERTEX_RADIUS*4;
+    scale = size * VERTEX_RADIUS;
 
-    canvas.width = 4*(size) * VERTEX_RADIUS + 2*VERTEX_RADIUS;
-    canvas.height = 4*(size) * VERTEX_RADIUS + 2*VERTEX_RADIUS;
+    canvas.width = 2*scale + 2*VERTEX_RADIUS;
+    canvas.height =2*scale + 2*VERTEX_RADIUS;
 
     if (controls.querySelector('#p-input').value != "") {
       p = num.parse(controls.querySelector('#p-input').value);
