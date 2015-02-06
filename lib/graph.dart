@@ -234,9 +234,6 @@ class ResampleRandomGraph extends ResampleGraph {
           count++;
         }
       }
-      if (count >= size*size*100) {
-        print('count too high');
-      }
     }
   }
 }

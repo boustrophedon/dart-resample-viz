@@ -2,11 +2,15 @@ import 'dart:math';
 import 'package:dart_resample_viz/graph.dart';
 
 void main() {
-  ResampleRandomGraph graph = new ResampleRandomGraph();
-  bool done = false;
-  while (!done) {
-    done = graph.step();
+  List<int> results = new List<int>();
+  for (int i = 0; i<100; i++) {
+    ResampleRandomGraph graph = new ResampleRandomGraph(size: 100);
+    bool done = false;
+    while (!done) {
+      done = graph.step();
+    }
+    results.add(graph.total_resamples);
   }
-  print("${graph.total_resamples}");
-  print("${graph.graph_type} ${graph.size} ${graph.p} ${graph.num_colors} ${graph.p_distribution}"); 
+  int avg = results.reduce((a,b) => (a+b))~/(results.length);
+  print("$avg");
 }
