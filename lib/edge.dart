@@ -5,7 +5,7 @@ class Edge {
   Vertex v2;
   int priority;
   bool isbad = true;
-  bool inheap = false;
+  bool instructure = false;
 
   Edge(this.v1, this.v2, this.priority) {
     v1.edges.add(this);

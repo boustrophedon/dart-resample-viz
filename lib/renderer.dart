@@ -20,12 +20,27 @@ class ResampleRenderer {
   bool running = true;
 
   int size = 10;
+  num p = null;
+  int p_distribution = null;
+  int num_colors = 6;
+  String resample_strategy;
+
 
   ResampleRenderer(this.canvas, this.controls, this.output, {this.VERTEX_RADIUS: 9}) {
     if (controls.querySelector('#size-input').value != "") {
       size = int.parse(controls.querySelector('#size-input').value);
     }
-    
+    if (controls.querySelector('#p-input').value != "") {
+      p = num.parse(controls.querySelector('#p-input').value);
+    }
+    if (controls.querySelector('#dist-input').value != "") {
+      p_distribution = int.parse(controls.querySelector('#dist-input').value);
+    }
+    if (controls.querySelector('#colors-input').value != "") {
+      num_colors = int.parse(controls.querySelector('#colors-input').value);
+    }
+    resample_strategy = (querySelector("#strategy-input") as SelectElement).selectedOptions.first.value;
+
     context = canvas.context2D;
 
     step_delay = new Duration(milliseconds: controls.querySelector("#timer-value").valueAsNumber*10);
@@ -93,29 +108,17 @@ class ResampleRenderer {
 
 class ResampleGridRenderer extends ResampleRenderer {
   ResampleGridRenderer(canvas, controls, output, {VERTEX_RADIUS: 9}) : super(canvas, controls, output, VERTEX_RADIUS: VERTEX_RADIUS) {
-    num p = null;
-    int p_distribution = null;
-    int num_colors = 6;
     bool torus = controls.querySelector('#torus-check').checked;
     num q = 0;
     
     canvas.width = size * 4 * VERTEX_RADIUS - 2 * VERTEX_RADIUS;
     canvas.height = size * 4 * VERTEX_RADIUS - 2 * VERTEX_RADIUS;
 
-    if (controls.querySelector('#p-input').value != "") {
-      p = num.parse(controls.querySelector('#p-input').value);
-    }
-    if (controls.querySelector('#dist-input').value != "") {
-      p_distribution = int.parse(controls.querySelector('#dist-input').value);
-    }
-    if (controls.querySelector('#colors-input').value != "") {
-      num_colors = int.parse(controls.querySelector('#colors-input').value);
-    }
     if (controls.querySelector('#diagonal-input').value != "") {
       q = num.parse(controls.querySelector('#diagonal-input').value);
     }
     try {
-      graph = new ResampleGridGraph(size: size, p: p, p_distribution: p_distribution, num_colors: num_colors, is_torus: torus, q: q);
+      graph = new ResampleGridGraph(size: size, p: p, p_distribution: p_distribution, num_colors: num_colors, resample_strategy: resample_strategy, is_torus: torus, q: q);
     } catch(e) {
       output.value+=e.toString();
       throw e;
@@ -185,9 +188,6 @@ class ResampleGridRenderer extends ResampleRenderer {
 class ResampleRandomRenderer extends ResampleRenderer {
   num scale;
   ResampleRandomRenderer(canvas, controls, output, {VERTEX_RADIUS: 9}) : super(canvas, controls, output, VERTEX_RADIUS: VERTEX_RADIUS) {
-    num p = null;
-    int p_distribution = null;
-    int num_colors = 6;
     int degree = 4;
 
     scale = size * VERTEX_RADIUS;
@@ -195,20 +195,11 @@ class ResampleRandomRenderer extends ResampleRenderer {
     canvas.width = 2*scale + 2*VERTEX_RADIUS;
     canvas.height =2*scale + 2*VERTEX_RADIUS;
 
-    if (controls.querySelector('#p-input').value != "") {
-      p = num.parse(controls.querySelector('#p-input').value);
-    }
-    if (controls.querySelector('#dist-input').value != "") {
-      p_distribution = int.parse(controls.querySelector('#dist-input').value);
-    }
-    if (controls.querySelector('#colors-input').value != "") {
-      num_colors = int.parse(controls.querySelector('#colors-input').value);
-    }
     if (controls.querySelector('#degree-input').value != "") {
       degree = int.parse(controls.querySelector('#degree-input').value);
     }
     try {
-      graph = new ResampleRandomGraph(size: size, p: p, p_distribution: p_distribution, num_colors: num_colors, degree: degree);
+      graph = new ResampleRandomGraph(size: size, p: p, p_distribution: p_distribution, num_colors: num_colors, resample_strategy: resample_strategy, degree: degree);
     } catch(e) {
       output.value+=e.toString();
       throw e;

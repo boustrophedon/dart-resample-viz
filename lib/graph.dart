@@ -6,6 +6,8 @@ import 'package:collection/priority_queue.dart';
 part 'vertex.dart';
 part 'edge.dart';
 
+part 'strategies.dart';
+
 class ResampleGraph {
   int size;
   int total_resamples = 0;
@@ -19,10 +21,13 @@ class ResampleGraph {
   int p_distribution; // this tells us how many of the probabilities in the distribution are equal to p
   List<num> probabilities;
 
-  List<Vertex> vertices;
-  HeapPriorityQueue heap;
+  String resample_strategy;
 
-  ResampleGraph(this.size, this.num_colors, this.p, this.p_distribution) {
+  List<Vertex> vertices;
+
+  ResampleStrategy resampler;
+
+  ResampleGraph(this.size, this.num_colors, this.p, this.p_distribution, this.resample_strategy) {
     if (p == null) {
       p = 1/num_colors;
     }
@@ -45,10 +50,29 @@ class ResampleGraph {
     if ( (1-sum).abs() > 0.00000001 ) {
       throw new ArgumentError("Your probabilities do not sum to 1: ${probabilities}");
     }
-    heap = new HeapPriorityQueue((e1,e2) => (e1.priority - e2.priority));
+
+    create_resampler();
+
     generate_colors();
     generate_vertices();
     generate_edges();
+  }
+
+  void create_resampler() {
+    switch (resample_strategy) {
+      case 'fixed':
+        resampler = new FixedStrategy();
+        break;
+      case 'random':
+        //resampler = new RandomStrategy();
+        break;
+      case 'least-bad-neighbors':
+        //resampler = new EvilStrategy();
+        break;
+      default:
+        resampler = new FixedStrategy();
+        break;
+    }
   }
 
   void generate_colors() {
@@ -93,14 +117,12 @@ class ResampleGraph {
         return colors[i];
       }
     }
+    return null;
   }
   
   void new_edge(Vertex v1, Vertex v2, int priority) {
     Edge e = new Edge(v1, v2, priority);
-    if (e.isbad) {
-      heap.add(e);
-      e.inheap = true;
-    }
+    resampler.add_edge(e);
   }
 
   void generate_edges() {}
@@ -114,48 +136,25 @@ class ResampleGraph {
     total_resamples+=1;
 
     for (Edge n in e.v1.edges) {
-      n.update_badness();
-      if ( (!n.inheap) && (n.isbad) ) {
-        heap.add(n);
-        n.inheap = true;
-      }
+      resampler.update_edge(n);
     }
     for (Edge n in e.v2.edges) {
-      n.update_badness();
-      if ( (!n.inheap) && (n.isbad) ) {
-        heap.add(n);
-        n.inheap = true;
-      }
+      resampler.update_edge(n);
     }
   }
 
   bool step() {
-    // this is kind of a mess with all of the isEmpty checks
-
-    if (heap.isEmpty) {
+    if (resampler.isEmpty) {
       return true;
     }
-    Edge e = heap.removeFirst();
-    e.inheap = false;
-
-    // if we picked an edge from the heap that was already fixed, keep going until we find one that is bad
-    while (!e.isbad && heap.isNotEmpty) {
-      e = heap.removeFirst();
-      e.inheap = false;
-    }
-    
-    if (e.isbad) {
-      do_resample(e);
-      if (heap.isEmpty) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-    else if (heap.isEmpty) {
+   
+    Edge e = resampler.next_edge();
+    if (e == null) {
       return true;
     }
+
+    do_resample(e);
+    return false;
   }
 }
 
@@ -165,7 +164,7 @@ class ResampleGridGraph extends ResampleGraph {
 
   String graph_type;
   ResampleGridGraph(
-      {size: 25, num_colors: 6, p: null, p_distribution: 3, this.is_torus: false, this.q: 0}) : super(size, num_colors, p, p_distribution) {
+      {size: 25, num_colors: 6, p: null, p_distribution: 3, resample_strategy: 'fixed', this.is_torus: false, this.q: 0}) : super(size, num_colors, p, p_distribution, resample_strategy) {
     if (is_torus) {
       graph_type = "Torus";
     }
@@ -203,7 +202,7 @@ class ResampleRandomGraph extends ResampleGraph {
 
   String graph_type;
   ResampleRandomGraph(
-      {size: 25, num_colors: 6, p: null, p_distribution: 3, this.degree: 4}) : super(size, num_colors, p, p_distribution) {
+      {size: 25, num_colors: 6, p: null, p_distribution: 3, resample_strategy: 'fixed', this.degree: 4}) : super(size, num_colors, p, p_distribution, resample_strategy) {
     graph_type = "Random";
   }
 
