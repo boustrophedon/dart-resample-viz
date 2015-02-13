@@ -53,3 +53,46 @@ class FixedStrategy implements ResampleStrategy {
 
   bool get isEmpty => heap.isEmpty;
 }
+
+class RandomStrategy implements ResampleStrategy {
+  List<Edge> bad_edges;
+  Random rng = new Random();
+  RandomStrategy() {
+    bad_edges = new List<Edge>();
+  }
+
+  void add_edge(Edge e) {
+    if (e.isbad) {
+      bad_edges.add(e);
+      e.instructure = true;
+    }
+  }
+
+  void update_edge(Edge e) {
+    e.update_badness();
+    if ( (!e.instructure) && (e.isbad) ) {
+      bad_edges.add(e);
+      e.instructure = true;
+    }
+  }
+
+  Edge next_edge() {
+    if (bad_edges.isEmpty) {
+      return null;
+    }
+    Edge e = bad_edges.removeAt(rng.nextInt(bad_edges.length));
+    e.instructure = false;
+    while (!e.isbad && bad_edges.isNotEmpty) {
+      e = bad_edges.removeAt(rng.nextInt(bad_edges.length));
+      e.instructure = false;
+    }
+    if (!e.isbad) {
+      return null;
+    }
+    else {
+      return e;
+    }
+  }
+
+  bool get isEmpty => bad_edges.isEmpty;
+}
