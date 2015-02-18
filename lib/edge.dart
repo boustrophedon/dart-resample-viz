@@ -14,10 +14,10 @@ class Edge {
   }
   void update_badness() {
     if (vertices.any((v)=>((v.color!=vertices.first.color)&&(v!=vertices.first)))) {
-      isbad = true;
+      isbad = false;
     }
     else {
-      isbad = false;
+      isbad = true;
     }
   }
   String toString() {
