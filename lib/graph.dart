@@ -120,8 +120,8 @@ class ResampleGraph {
     return null;
   }
   
-  void new_edge(Vertex v1, Vertex v2, int priority) {
-    Edge e = new Edge([v1, v2], priority);
+  void new_edge(List<Vertex> vertices, int priority) {
+    Edge e = new Edge(vertices, priority);
     resampler.add_edge(e);
   }
 
@@ -180,15 +180,15 @@ class ResampleGridGraph extends ResampleGraph {
     for (int y = 0; y < size; y++) {
       for (int x = 0; x < size; x++) {
         if (x+1 < size || is_torus) {
-          new_edge(vertices[y*size + x], vertices[y*size + (x+1)%size], priority);
+          new_edge([vertices[y*size + x], vertices[y*size + (x+1)%size]], priority);
           priority+=1;
         }
         if ( (((x+1 < size) && (y+1 < size)) || is_torus) && (rng.nextDouble() <= q)) {
-          new_edge(vertices[y*size + x], vertices[((y+1)%size)*size + (x+1)%size], priority);
+          new_edge([vertices[y*size + x], vertices[((y+1)%size)*size + (x+1)%size]], priority);
           priority+=1;
         }
         if (y+1 < size || is_torus) {
-          new_edge(vertices[y*size + x], vertices[((y+1)%size)*size + x], priority);
+          new_edge([vertices[y*size + x], vertices[((y+1)%size)*size + x]], priority);
           priority+=1;
         }
       }
@@ -217,7 +217,7 @@ class ResampleRandomGraph extends ResampleGraph {
   void generate_edges() {
     int priority = 0;
     for (int i = 0; i < size; i++) {
-      new_edge(vertices[i], vertices[(i+1)%size], priority);
+      new_edge([vertices[i], vertices[(i+1)%size]], priority);
       priority++;
     }
     for (Vertex v in vertices) {
@@ -225,7 +225,7 @@ class ResampleRandomGraph extends ResampleGraph {
       while (v.edges.length < degree && count < size*size*100) {
         Vertex vo = vertices[rng.nextInt(size)];
         if (vo.edges.length < degree && vo != v && !v.edges.any( (e)=>(e.vertices.any((v) =>(v == vo))) )) {
-          new_edge(v, vo, priority);
+          new_edge([v, vo], priority);
           priority++;
         }
         else {
