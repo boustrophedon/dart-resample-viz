@@ -1,19 +1,19 @@
 part of graph;
 
 class Edge {
-  Vertex v1;
-  Vertex v2;
+  List<Vertex> vertices;
   int priority;
   bool isbad = true;
   bool instructure = false;
 
-  Edge(this.v1, this.v2, this.priority) {
-    v1.edges.add(this);
-    v2.edges.add(this);
+  Edge(this.vertices, this.priority) {
+    for (Vertex v in vertices) {
+      v.edges.add(this);
+    }
     update_badness();
   }
   void update_badness() {
-    if (v1.color == v2.color) {
+    if (vertices.any((v)=>((v.color!=vertices.first.color)&&(v!=vertices.first)))) {
       isbad = true;
     }
     else {
@@ -21,6 +21,6 @@ class Edge {
     }
   }
   String toString() {
-    return "$v1";
+    return "$vertices";
   }
 }

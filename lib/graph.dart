@@ -121,25 +121,24 @@ class ResampleGraph {
   }
   
   void new_edge(Vertex v1, Vertex v2, int priority) {
-    Edge e = new Edge(v1, v2, priority);
+    Edge e = new Edge([v1, v2], priority);
     resampler.add_edge(e);
   }
 
   void generate_edges() {}
 
   void do_resample(Edge e) {
-    e.v1.color = choose_color();
-    e.v2.color = choose_color();
+    for (Vertex v in e.vertices) {
+      v.color = choose_color();
+      v.resamples+=1;
+    }
 
-    e.v1.resamples+=1;
-    e.v2.resamples+=1;
     total_resamples+=1;
 
-    for (Edge n in e.v1.edges) {
-      resampler.update_edge(n);
-    }
-    for (Edge n in e.v2.edges) {
-      resampler.update_edge(n);
+    for (Vertex v in e.vertices) {
+      for (Edge n in v.edges) {
+        resampler.update_edge(n);
+      }
     }
   }
 
@@ -225,7 +224,7 @@ class ResampleRandomGraph extends ResampleGraph {
       int count = 0;
       while (v.edges.length < degree && count < size*size*100) {
         Vertex vo = vertices[rng.nextInt(size)];
-        if (vo.edges.length < degree && vo != v && !v.edges.any( (edge)=>(edge.v1 == vo || edge.v2 == vo) )) {
+        if (vo.edges.length < degree && vo != v && !v.edges.any( (e)=>(e.vertices.any((v) =>(v == vo))) )) {
           new_edge(v, vo, priority);
           priority++;
         }

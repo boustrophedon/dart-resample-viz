@@ -109,14 +109,11 @@ class EvilStrategy extends DefaultResampleStrategy {
 
   int bad_neighbors(Edge e) {
     int bad = 0;
-    for (Edge n in e.v1.edges) {
-      if (n != e && n.isbad) {
-        bad++;
-      }
-    }
-    for (Edge n in e.v2.edges) {
-      if (n != e && n.isbad) {
-        bad++;
+    for (Vertex v in e.vertices) {
+      for (Edge n in v.edges) {
+        if (n != e && n.isbad) {
+          bad++;
+        }
       }
     }
     return bad;

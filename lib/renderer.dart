@@ -94,7 +94,7 @@ class ResampleRenderer {
     // draw edges and their vertices
     for (Vertex v in graph.vertices) {
       for (Edge e in v.edges) {
-        if (e.v1 == v) {
+        if (e.vertices.first == v) {
           draw_edge(e);
         }
       }
@@ -164,12 +164,12 @@ class ResampleGridRenderer extends ResampleRenderer {
   }
 
   void draw_edge(Edge e) {
-    if ((e.v1.x > e.v2.x) || (e.v1.y > e.v2.y)) {
+    if ((e.vertices[0].x > e.vertices[1].x) || (e.vertices[0].y > e.vertices[1].y)) {
       return;
     }
     if (e.isbad) {
       context.strokeStyle = '#FF0000';
-    } else if ((e.v1.x != e.v2.x) && (e.v1.y != e.v2.y)) {
+    } else if ((e.vertices[0].x != e.vertices[1].x) && (e.vertices[0].y != e.vertices[1].y)) {
       // diagonal edges are white
       context.strokeStyle = '#FFFFFF';
     } else {
@@ -177,10 +177,10 @@ class ResampleGridRenderer extends ResampleRenderer {
     }
     context.lineWidth = 4;
     context.beginPath();
-    context.moveTo(e.v1.x * VERTEX_RADIUS * 4 + VERTEX_RADIUS,
-        canvas.height - (e.v1.y * VERTEX_RADIUS * 4) - VERTEX_RADIUS);
-    context.lineTo(e.v2.x * VERTEX_RADIUS * 4 + VERTEX_RADIUS,
-        canvas.height - (e.v2.y * VERTEX_RADIUS * 4) - VERTEX_RADIUS);
+    context.moveTo(e.vertices[0].x * VERTEX_RADIUS * 4 + VERTEX_RADIUS,
+        canvas.height - (e.vertices[0].y * VERTEX_RADIUS * 4) - VERTEX_RADIUS);
+    context.lineTo(e.vertices[1].x * VERTEX_RADIUS * 4 + VERTEX_RADIUS,
+        canvas.height - (e.vertices[1].y * VERTEX_RADIUS * 4) - VERTEX_RADIUS);
     context.stroke();
     context.closePath();
   }
@@ -244,10 +244,10 @@ class ResampleRandomRenderer extends ResampleRenderer {
     }
     context.lineWidth = 4;
     context.beginPath();
-    context.moveTo(e.v1.x*scale + scale + VERTEX_RADIUS,
-        e.v1.y*scale + scale + VERTEX_RADIUS);
-    context.lineTo(e.v2.x*scale + scale + VERTEX_RADIUS,
-        e.v2.y*scale + scale + VERTEX_RADIUS);
+    context.moveTo(e.vertices[0].x*scale + scale + VERTEX_RADIUS,
+        e.vertices[0].y*scale + scale + VERTEX_RADIUS);
+    context.lineTo(e.vertices[1].x*scale + scale + VERTEX_RADIUS,
+        e.vertices[1].y*scale + scale + VERTEX_RADIUS);
     context.stroke();
     context.closePath();
   }
