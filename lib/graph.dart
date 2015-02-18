@@ -67,7 +67,7 @@ class ResampleGraph {
         resampler = new RandomStrategy();
         break;
       case 'least-bad-neighbors':
-        //resampler = new EvilStrategy();
+        resampler = new EvilStrategy();
         break;
       default:
         resampler = new FixedStrategy();
