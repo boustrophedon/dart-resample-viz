@@ -223,9 +223,9 @@ class ResampleRandomGraph extends ResampleGraph {
     for (Vertex v in vertices) {
       int count = 0;
       while (v.edges.length < degree && count < size*size*100) {
-        Vertex vo = vertices[rng.nextInt(size)];
-        if (vo.edges.length < degree && vo != v && !v.edges.any( (e)=>(e.vertices.any((v) =>(v == vo))) )) {
-          new_edge([v, vo], priority);
+        Vertex vnew = pick_vertex([v,]);
+        if (vnew != null) {
+          new_edge([v, vnew], priority);
           priority++;
         }
         else {
@@ -233,5 +233,95 @@ class ResampleRandomGraph extends ResampleGraph {
         }
       }
     }
+  }
+  Vertex pick_vertex(List<Vertex> verts) {
+    Vertex vnew = vertices[rng.nextInt(size)];
+    if (verts.contains(vnew)) {
+      return null;
+    }
+    else if (vnew.edges.length == degree) {
+      return null;
+    }
+    // if any of the edges of one of the vertices in the current edge
+    // contains all of the vertices in the current edge and vnew
+    // the edge is a duplicate
+    else if (verts.first.edges.any((e)=>(verts.every((v) => (e.vertices.contains(v) && e.vertices.contains(vnew)))))){
+      return null;
+    }
+    else {
+      return vnew;
+    }
+  }
+}
+
+class ResampleRandomKHypergraph extends ResampleRandomGraph {
+  int edge_cardinality; // number of vertices per edge
+  ResampleRandomKHypergraph(
+      {size: 25, num_colors: 6, p: null, p_distribution: 3, resample_strategy: 'fixed', degree: 4, this.edge_cardinality: 2}) :
+    super(size: size, num_colors: num_colors, p: p, p_distribution: p_distribution, resample_strategy: resample_strategy, degree: degree) {
+        graph_type = "Random ${edge_cardinality}-hypergraph";
+      }
+  void generate_edges() {
+    int priority = 0;
+    for (int i = 0; i < size; i++) {
+      List<Vertex> verts = new List<Vertex>();
+      for (int k = 0; k<edge_cardinality; k++) {
+        verts.add(vertices[(i+k)%size]);
+      }
+      new_edge(verts, priority);
+      priority++;
+    }
+    for (Vertex v in vertices) {
+      int count = 0;
+      // create degree number of edges with edge_cardinality vertices
+      while (v.edges.length < degree && count < size*size*100*edge_cardinality) {
+        List<Vertex> verts = generate_edge(v);
+        if (verts != null) {
+          new_edge(verts, priority);
+          priority++;
+        }
+        else {
+          count++;
+        }
+      }
+    }
+  }
+
+  List<Vertex> generate_edge(Vertex v) {
+    List<Vertex> verts = new List<Vertex>();
+    verts.add(v);
+    for (int i = 0; i < edge_cardinality-1;i++) {
+      Vertex vnew = vertices[rng.nextInt(size)];
+      while(verts.contains(vnew)) {
+        vnew = vertices[rng.nextInt(size)];
+      }
+      verts.add(vnew);
+    }
+    if (check_edge(verts)) {
+      return verts;
+    }
+    else {
+      return null;
+    }
+  }
+  bool check_edge(List<Vertex> verts) {
+    for (Vertex v in verts) {
+      if (v.edges.length == degree) {
+        return false;
+      }
+    }
+    int is_good = true;
+    for (Edge e in verts.first.edges) {
+      int total = 0;
+      for (Vertex v in verts) {
+        if (e.vertices.contains(v)) {
+          total++;
+        }
+      }
+      if (total == verts.length) {
+        is_good = false;
+      }
+    }
+    return is_good;
   }
 }
